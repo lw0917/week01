@@ -5,7 +5,8 @@ var server=require('gulp-webserver');
 var fs=require('fs');
 var path=require('path');
 var url=require('url');
-
+var uglify=require('gulp-uglify');
+var babel=require('gulp-babel');
 
    //编译scss
    gulp.task('devSass',function(){
@@ -32,9 +33,38 @@ var url=require('url');
                          pathname=pathname==='/'?'index.html':pathname;
                          res.end(fs.readFileSync(path.join(__dirname,'src',pathname)));
                      }
-                 }))
-                   
+                 }))           
     })
 
    //开发环境
-   gulp.task('dev',gulp.series('devSass','watch'));
+   gulp.task('dev',gulp.series('devSass','devServer','watch'));
+
+   //线上环境
+
+   //拷贝css
+   gulp.task('bCss',function(){
+        return gulp.src('./src/css/*.css')
+               .pipe(gulp.dest('./bulid/css'))
+   })
+   //压缩js
+   gulp.task('bUglify',function(){
+         return gulp.src('./src/js/*js')
+                .pipe(babel({
+		        	presets: ['@babel/env']
+	          	 }))
+                .pipe(uglify())
+                .pipe(gulp.dest('./bulid/js'))
+   })
+   //拷贝js
+   gulp.task('bCopy',function(){
+    return gulp.src('./src/js/libs/*js')
+           .pipe(gulp.dest('./bulid/js/libs'))
+   })
+   //拷贝html
+   gulp.task('bHtml',function(){
+    return gulp.src('./src/*.html')
+           .pipe(gulp.dest('./bulid'))
+   })
+
+   //线上
+   gulp.task('bulid',gulp.parallel('bCss','bUglify','bCopy','bHtml'))

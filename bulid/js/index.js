@@ -1,0 +1,1 @@
+"use strict";for(var a=[1,2,3,4,5],html="",i=0;i<10;i++)html+="<p>".concat(i,"</p>");
